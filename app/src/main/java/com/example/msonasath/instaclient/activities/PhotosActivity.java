@@ -96,24 +96,33 @@ public class PhotosActivity extends AppCompatActivity {
                     photosJSON = response.getJSONArray("data"); //array of posts
                     //iterate array of posts
                     for (int i = 0; i < photosJSON.length(); i++) {
-                        // get the JSON object at that position
-                        JSONObject photoJSON = photosJSON.getJSONObject(i);
-                        //decode the attributes of json into a data model
-                        InstaPhoto photo = new InstaPhoto();
-                        photo.username = photoJSON.getJSONObject("user").getString("username");
-                        photo.caption = photoJSON.getJSONObject("caption").getString("text");
-                        photo.imageUrl = photoJSON.getJSONObject("images").getJSONObject("standard_resolution").getString("url");
-                        photo.imageHeight = photoJSON.getJSONObject("images").getJSONObject("standard_resolution").getInt("height");
-                        photo.likesCount = photoJSON.getJSONObject("likes").getInt("count");
-                        photo.userImageUrl = photoJSON.getJSONObject("user").getString("profile_picture");
-                        photo.userFullName = photoJSON.getJSONObject("user").getString("full_name");
-                        photo.createdTime = photoJSON.getLong("created_time");
-                        //Add decoded objects to photos array
-                        photos.add(photo);
-                        aPhotos.notifyDataSetChanged();
-                        swipeContainer.setRefreshing(false);
+                        try {
+                            // get the JSON object at that position
+                            JSONObject photoJSON = photosJSON.getJSONObject(i);
+                            //decode the attributes of json into a data model
+                            InstaPhoto photo = new InstaPhoto();
+                            photo.username = photoJSON.getJSONObject("user").getString("username");
+                            if (!photoJSON.isNull("caption") && photoJSON.has("caption") ) {
+                                photo.caption = photoJSON.getJSONObject("caption").getString("text");
+                            } else {
+                                photo.caption = "";
+                            }
+                            photo.imageUrl = photoJSON.getJSONObject("images").getJSONObject("standard_resolution").getString("url");
+                            photo.imageHeight = photoJSON.getJSONObject("images").getJSONObject("standard_resolution").getInt("height");
+                            photo.likesCount = photoJSON.getJSONObject("likes").getInt("count");
+                            photo.userImageUrl = photoJSON.getJSONObject("user").getString("profile_picture");
+                            photo.userFullName = photoJSON.getJSONObject("user").getString("full_name");
+                            photo.createdTime = photoJSON.getLong("created_time");
+                            //Add decoded objects to photos array
+                            photos.add(photo);
+                            aPhotos.notifyDataSetChanged();
+                            swipeContainer.setRefreshing(false);
+                        } catch (JSONException e) {
+                            Log.d("JSON", "" + e);
+                        }
                     }
                 } catch (JSONException e) {
+                    Log.d("JSON", "" + e);
                     e.printStackTrace();
                 }
             }
