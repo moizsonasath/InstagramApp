@@ -25,7 +25,7 @@
         android:layout_below="@+id/ivLikes"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginBottom="5dp"/>
+        android:layout_marginBottom="10dp"/>
 
     <ImageView
         android:layout_width="wrap_content"
@@ -49,14 +49,19 @@
         android:layout_toRightOf="@+id/ivLikes"
         android:layout_toEndOf="@+id/ivLikes" />
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <com.makeramen.roundedimageview.RoundedImageView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/ivProfile"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:scaleType="fitStart"
-        android:layout_marginTop="5dp"/>
+        android:scaleType="fitCenter"
+        android:layout_height="50dp"
+        android:layout_width="50dp"
+        android:layout_marginTop="5dp"
+        app:riv_corner_radius="30dip"
+        app:riv_border_width="2dip"
+        app:riv_border_color="#206199"
+        app:riv_mutate_background="true"
+        app:riv_tile_mode="repeat"
+        app:riv_oval="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -69,7 +74,10 @@
         android:textSize="20sp"
         android:textColor="#206199"
         android:textStyle="bold"
-        android:layout_marginTop="5dp"/>
+        android:layout_marginTop="12dp"
+        android:ellipsize="end"
+        android:singleLine="false"
+        android:minLines="2" />
 
     <ImageView
         android:id="@+id/ivTime"

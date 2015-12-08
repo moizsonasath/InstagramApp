@@ -1,11 +1,18 @@
-package com.example.msonasath.instaclient;
+package com.example.msonasath.instaclient.activities;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.example.msonasath.instaclient.models.InstaPhoto;
+import com.example.msonasath.instaclient.adapters.InstaPhotosAdapter;
+import com.example.msonasath.instaclient.R;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
@@ -55,7 +62,6 @@ public class PhotosActivity extends AppCompatActivity {
         URL: https://api.instagram.com/v1/media/popular?access_token=ACCESS-TOKEN
              https://api.instagram.com/v1/media/popular?client_id=CLIENT_ID
         */
-
         photos = new ArrayList<>();
         //1. create the adapter linking to the source
         aPhotos = new InstaPhotosAdapter(this, photos);
@@ -67,20 +73,29 @@ public class PhotosActivity extends AppCompatActivity {
         String url = "https://api.instagram.com/v1/media/popular?client_id=" + CLIENT_ID;
         // create the network client
         AsyncHttpClient client = new AsyncHttpClient();
+
+        //first check if network connection is available
+        if(isConnectedToNetwork() == false) {
+            CharSequence toastMsg = "Please check your network connection!";
+            Toast toast = Toast.makeText(this.getApplicationContext(), toastMsg, Toast.LENGTH_LONG);
+            toast.show();
+            swipeContainer.setRefreshing(false);
+            return;
+        }
+
         //trigger the GET request
-        client.get(url, null, new JsonHttpResponseHandler(){
+        client.get(url, null, new JsonHttpResponseHandler() {
 
             //onSuccess (worked, 200)
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 // expecting a JSON object
                 // iterate each of the photo items and decode the item into java object
-
                 JSONArray photosJSON = null;
                 try {
                     photosJSON = response.getJSONArray("data"); //array of posts
                     //iterate array of posts
-                    for (int i=0; i < photosJSON.length(); i++) {
+                    for (int i = 0; i < photosJSON.length(); i++) {
                         // get the JSON object at that position
                         JSONObject photoJSON = photosJSON.getJSONObject(i);
                         //decode the attributes of json into a data model
@@ -98,8 +113,7 @@ public class PhotosActivity extends AppCompatActivity {
                         aPhotos.notifyDataSetChanged();
                         swipeContainer.setRefreshing(false);
                     }
-
-                }catch (JSONException e){
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
@@ -107,10 +121,30 @@ public class PhotosActivity extends AppCompatActivity {
             //onfailure (failed,)
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Log.i("DEBUG", "Request failed");
+                CharSequence toastMsg = "HTTP Request failed";
+                Toast toast = Toast.makeText(getApplicationContext(), toastMsg, Toast.LENGTH_LONG);
+                toast.show();
+                swipeContainer.setRefreshing(false);
+                Log.i("DEBUG", "HTTP Request failed");
             }
         });
 
     }
+
+    private boolean isConnectedToNetwork()
+    {
+        ConnectivityManager connMgr = (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if(networkInfo != null && networkInfo.isConnected()) {
+            Log.e("NETWORK", "isConnectedToNetwork return true");
+            return true;
+        }
+        else {
+            Log.e("NETWORK", "isConnectedToNetwork return false");
+            return false;
+        }
+
+    }
+
 
 }

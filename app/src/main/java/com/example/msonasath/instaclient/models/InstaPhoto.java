@@ -1,4 +1,4 @@
-package com.example.msonasath.instaclient;
+package com.example.msonasath.instaclient.models;
 
 /**
  * Created by m.sonasath on 12/1/2015.
